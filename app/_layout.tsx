@@ -1,65 +1,52 @@
-// app/_layout.tsx
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import { SplashScreen } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Define types for auth context if needed
-interface AuthContextType {
-  isAuthenticated: boolean;
-  setIsAuthenticated: (value: boolean) => void;
-}
-
-// Keep the splash screen visible while we fetch resources
+// Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout(): JSX.Element | null {
+export default function RootLayout() {
+  const [isReady, setIsReady] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
   const segments = useSegments();
-  const [isReady, setIsReady] = useState<boolean>(false);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
-    checkAuthStatus();
+    async function prepare() {
+      try {
+        // Check authentication status
+        const token = await AsyncStorage.getItem('userToken');
+        setIsAuthenticated(!!token);
+        setIsReady(true);
+      } catch (error) {
+        console.error('Error preparing app:', error);
+        setIsReady(true);
+      }
+    }
+
+    prepare();
   }, []);
 
   useEffect(() => {
-    if (!isReady) {
-      return;
-    }
+    if (!isReady) return;
 
-    const inAuthGroup: boolean = segments[0] === '(auth)';
+    const inAuthGroup = segments[0] === '(auth)';
 
     if (!isAuthenticated && !inAuthGroup) {
-      // Redirect to the sign-in page
-      router.replace('/sign-in');
+      router.replace('/(auth)/sign-in');
     } else if (isAuthenticated && inAuthGroup) {
-      // Redirect to the home page
       router.replace('/(tabs)/chats');
     }
+
+    // Hide splash screen after navigation is determined
+    SplashScreen.hideAsync();
   }, [isReady, isAuthenticated, segments]);
 
-  const checkAuthStatus = async (): Promise<void> => {
-    try {
-      // Check your authentication status here
-      const token = await AsyncStorage.getItem('userToken');
-      setIsAuthenticated(!!token);
-    } catch (error) {
-      console.error('Error checking auth status:', error);
-      setIsAuthenticated(false);
-    } finally {
-      setIsReady(true);
-      // Hide splash screen once we're done
-      await SplashScreen.hideAsync();
-    }
-  };
-
-  // Optional: Add loading component
   if (!isReady) {
     return null;
   }
 
-  // Return the main app content
   return <Slot />;
 }
