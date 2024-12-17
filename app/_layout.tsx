@@ -1,39 +1,65 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+// app/_layout.tsx
+import { useEffect, useState } from 'react';
+import { View } from 'react-native';
+import { SplashScreen } from 'expo-router';
+import { Slot, useRouter, useSegments } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+// Define types for auth context if needed
+interface AuthContextType {
+  isAuthenticated: boolean;
+  setIsAuthenticated: (value: boolean) => void;
+}
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
+// Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+export default function RootLayout(): JSX.Element | null {
+  const router = useRouter();
+  const segments = useSegments();
+  const [isReady, setIsReady] = useState<boolean>(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
+    checkAuthStatus();
+  }, []);
 
-  if (!loaded) {
+  useEffect(() => {
+    if (!isReady) {
+      return;
+    }
+
+    const inAuthGroup: boolean = segments[0] === '(auth)';
+
+    if (!isAuthenticated && !inAuthGroup) {
+      // Redirect to the sign-in page
+      router.replace('/sign-in');
+    } else if (isAuthenticated && inAuthGroup) {
+      // Redirect to the home page
+      router.replace('/(tabs)/chats');
+    }
+  }, [isReady, isAuthenticated, segments]);
+
+  const checkAuthStatus = async (): Promise<void> => {
+    try {
+      // Check your authentication status here
+      const token = await AsyncStorage.getItem('userToken');
+      setIsAuthenticated(!!token);
+    } catch (error) {
+      console.error('Error checking auth status:', error);
+      setIsAuthenticated(false);
+    } finally {
+      setIsReady(true);
+      // Hide splash screen once we're done
+      await SplashScreen.hideAsync();
+    }
+  };
+
+  // Optional: Add loading component
+  if (!isReady) {
     return null;
   }
 
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
-  );
+  // Return the main app content
+  return <Slot />;
 }
