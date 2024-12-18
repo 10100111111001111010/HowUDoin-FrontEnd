@@ -6,7 +6,7 @@ const SignIn = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>Sign In</Text>
+        <Text style={styles.title}> Please Sign In</Text>
       </View>
     </SafeAreaView>
   );
