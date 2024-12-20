@@ -1,6 +1,8 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from 'react-native';
+import ChatsHeader from '../../components/ui/ChatsHeader';
+import {View} from 'react-native';
 
 export default function TabsLayout() {
   const colorScheme = useColorScheme();
@@ -9,9 +11,9 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         tabBarStyle: {
-          backgroundColor: colorScheme === 'dark' ? '#1A1A1A' : '#FFFFFF',
-          borderTopWidth: 1,
-          borderTopColor: colorScheme === 'dark' ? '#333333' : '#E5E5E5',
+          backgroundColor: colorScheme === 'dark' ? '#1A1A1A' : '#E8DACD',
+          borderTopWidth: 0.5,
+          borderTopColor: colorScheme === 'dark' ? '#333333' : '#000000',
           paddingBottom: 5,
           paddingTop: 5,
           height: 60,

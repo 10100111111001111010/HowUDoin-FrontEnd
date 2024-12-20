@@ -35,7 +35,7 @@ export default function RootLayout() {
 
     const inAuthGroup = segments[0] === '(auth)';
 
-    if (!isAuthenticated && !inAuthGroup) 
+    if (isAuthenticated && inAuthGroup) 
     {
       router.replace('/(auth)/sign-in');
     } else if (isAuthenticated && inAuthGroup) {

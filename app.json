@@ -4,36 +4,27 @@
     "slug": "HowUDoin",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/ios.png",
+    "icon": "./assets/images/icon.png",
     "scheme": "howudoin",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-
     "splash": {
-      "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#D3C6BA"
+      "image": "./assets/images/splash-4096-4096.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#D3C6BA",
+      "showSpinner" : false
     },
-    
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.HowUDoin"
     },
-    
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/Adaptive.png",
         "backgroundColor": "#000000"
       }
     },
-    
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/ios.png"
-    },
-    
-    "plugins": 
-    [
+    "plugins": [
       "expo-router"
     ],
     "experiments": {
