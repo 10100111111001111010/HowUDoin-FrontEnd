@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import { View, TextInput, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-const SearchBar = () => {
+interface SearchBarProps {
+  onSearchChange?: (text: string) => void;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({ onSearchChange }) => {
   const [isFocused, setIsFocused] = useState(false);
 
   return (
@@ -15,6 +19,7 @@ const SearchBar = () => {
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         caretHidden={!isFocused}
+        onChangeText={onSearchChange}
       />
     </View>
   );
