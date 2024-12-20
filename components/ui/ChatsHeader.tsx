@@ -4,6 +4,7 @@ import Feather from '@expo/vector-icons/Feather';
 import { useRouter } from 'expo-router'
 
 
+
 const ChatsHeader = () => {
   const router = useRouter();
 
@@ -16,7 +17,7 @@ const ChatsHeader = () => {
       >
 
 
-        <Feather name="plus-circle" size={25.5} color="black" />
+        <Feather name="plus-circle" size={25} color="black" />
         
       </TouchableOpacity>
     </View>
@@ -32,7 +33,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 4,
     backgroundColor: '#D3C6BA',
-    borderBottomWidth: 1,
+    borderBottomWidth: 2,
     borderBottomColor: 'rgba(0,0,0,0.1)',
   },
   headerTitle: {

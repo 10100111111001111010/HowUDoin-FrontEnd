@@ -4,7 +4,6 @@ import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import ContactsHeader from '../../components/ui/ContactsHeader'
 import SearchBar from '@/components/ui/SearchBar'
-import { Ionicons } from '@expo/vector-icons';
 
 const Contacts = () => {
   return (

@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
   },
   menuItemText: {
     fontSize: 20,
-    fontWeight: 'semibold',
+    fontWeight: '500',
     color: '#000000',
   },
   softwareVersion: {
