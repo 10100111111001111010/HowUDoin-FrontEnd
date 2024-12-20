@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, TextInput, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 const SearchBar = () => {
+  const [isFocused, setIsFocused] = useState(false);
+
   return (
     <View style={styles.container}>
       <Ionicons name="search-outline" size={20} color="gray" style={styles.icon} />
@@ -10,6 +12,9 @@ const SearchBar = () => {
         style={styles.input}
         placeholder="Search"
         placeholderTextColor="gray"
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        caretHidden={!isFocused}
       />
     </View>
   );
