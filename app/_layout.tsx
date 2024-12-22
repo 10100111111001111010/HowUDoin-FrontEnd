@@ -38,7 +38,7 @@ export default function RootLayout() {
     if (isAuthenticated && inAuthGroup) 
     {
       router.replace('/(tabs)/chats');
-    } else {
+    } else if(isAuthenticated && inAuthGroup){
       router.replace('/(auth)/signin');
     }
 
