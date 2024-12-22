@@ -34,12 +34,12 @@ export default function RootLayout() {
     if (!isReady) return;
 
     const inAuthGroup = segments[0] === '(auth)';
-
+      console.log("login debug", isAuthenticated,inAuthGroup);
     if (isAuthenticated && inAuthGroup) 
     {
-      router.replace('/(auth)/sign-in');
-    } else if (isAuthenticated && inAuthGroup) {
       router.replace('/(tabs)/chats');
+    } else {
+      router.replace('/(auth)/signin');
     }
 
     // Hide splash screen after navigation is determined
