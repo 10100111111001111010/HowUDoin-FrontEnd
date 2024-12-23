@@ -1,10 +1,10 @@
-// app/(tabs)/settings/index.tsx
-import { View, StyleSheet, Pressable, Text } from 'react-native';
+import { View, StyleSheet, Pressable, Text, Alert } from 'react-native';
 import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import SettingsHeader from '@/components/ui/SettingsHeader';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type SettingsRoute = 
   | 'profile'
@@ -68,8 +68,27 @@ const Settings = () => {
     },
   ];
 
+  const handleSignOut = async () => {
+    try {
+      // Kullanıcı bilgilerini temizle
+      await AsyncStorage.removeItem('userToken');
+      await AsyncStorage.removeItem('userId');
+      
+      // Bilgi mesajı göster ve giriş sayfasına yönlendir
+      Alert.alert('Success', 'You have been signed out.');
+      router.replace('/(auth)/signin');
+    } catch (error) {
+      console.error('Error during sign-out:', error);
+      Alert.alert('Error', 'An error occurred while signing out.');
+    }
+  };
+
   const handlePress = (route: SettingsRoute) => {
-    router.push(`/(subtabs)/(settings)/${route}` as const);
+    if (route === 'sign-out') {
+      handleSignOut();
+    } else {
+      router.push(`/(subtabs)/(settings)/${route}` as const);
+    }
   };
 
   return (
@@ -88,7 +107,7 @@ const Settings = () => {
           >
             <View style={styles.menuItemContent}>
               <View style={styles.leftContent}>
-                <Ionicons name={item.iconName} size={24} color= {item.route == 'delete-account' ? '#EF0808' : '#007AFF'} />
+                <Ionicons name={item.iconName} size={24} color={item.route === 'delete-account' ? '#EF0808' : '#007AFF'} />
                 <Text style={styles.menuItemText}>{item.title}</Text>
               </View>
               <Ionicons name="chevron-forward" size={24} color="#C7C7CC" />
