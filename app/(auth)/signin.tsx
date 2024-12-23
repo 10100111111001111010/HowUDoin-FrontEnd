@@ -76,7 +76,7 @@ const SignInScreen = () => {
 
         <Link  style={styles.signUpTextContainer} href="/(auth)/signup" relativeToDirectory>
             <Text style={styles.signUpText}>
-Don't hgave an account?
+Don't have an account?
 <Text style={styles.signUpLink}> Sign Up</Text>
             </Text>
         </Link>
