@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useColorScheme } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -41,6 +42,16 @@ export default function TabsLayout() {
             title: 'Chats',
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="chatbubbles" size={32} color={color} />
+            ),
+          }}
+        />
+
+        <Tabs.Screen
+          name="groupchats"
+          options={{
+            title: 'Group Chats',
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons name="account-group" size={32} color={color} />
             ),
           }}
         />

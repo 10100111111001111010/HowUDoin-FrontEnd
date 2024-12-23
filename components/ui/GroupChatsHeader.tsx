@@ -4,7 +4,7 @@ import { useRouter, usePathname, Href } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import PressableHeaderText from './PressableHeaderText';
 
-const ChatsHeader = () => {
+const GroupChatsHeader = () => {
   const router = useRouter();
   const pathname = usePathname();
   const isGroupChatsScreen = pathname.includes('/(tabs)/groupchats');
@@ -18,16 +18,16 @@ const ChatsHeader = () => {
     <View style={styles.header}>
       <View style={styles.titleContainer}>
         <PressableHeaderText
-          text="Chats"
-          route={chatsRoute}
-          isActive={!isGroupChatsScreen}  // Active when NOT on group chats
+          text="Group Chats"
+          route={groupChatsRoute}
+          isActive={!isGroupChatsScreen}  // Inactive in group chats screen
           isElevated={!isGroupChatsScreen}
           style={styles.leftText}
         />
         <PressableHeaderText
-          text="Group Chats"
-          route={groupChatsRoute}
-          isActive={isGroupChatsScreen}  // Active when on group chats
+          text="Chats"
+          route={chatsRoute}
+          isActive={isGroupChatsScreen}  // Active in group chats screen
           isElevated={isGroupChatsScreen}
           style={styles.rightText}
         />
@@ -37,12 +37,11 @@ const ChatsHeader = () => {
         style={styles.plusButton}
         onPress={() => router.push(contactsRoute as any)}
       >
-        <Feather name="plus-circle" size={24} color="#000000" />
+        <Feather name="plus-circle" size={25} color="black" />
       </TouchableOpacity>
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   header: {
@@ -72,4 +71,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChatsHeader;
+export default GroupChatsHeader;
