@@ -1,77 +1,87 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { NavigationProp } from '@react-navigation/native';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 
-const SignUpScreen = ({ navigation }: { navigation: NavigationProp<any> }) => {
+const SignUpScreen = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  const validateEmail = (email: string) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
+  const validateInput = () => {
+    if (!firstName.trim()) {
+      Alert.alert('Error', 'First name is required');
+      return false;
+    }
+    if (!lastName.trim()) {
+      Alert.alert('Error', 'Last name is required');
+      return false;
+    }
+    if (!email.trim()) {
+      Alert.alert('Error', 'Email is required');
+      return false;
+    }
+    if (!password.trim()) {
+      Alert.alert('Error', 'Password is required');
+      return false;
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert('Error', 'Please enter a valid email address');
+      return false;
+    }
+    
+    if (password.length < 6) {
+      Alert.alert('Error', 'Password must be at least 6 characters long');
+      return false;
+    }
+    
+    return true;
   };
 
   const handleSignUp = async () => {
-    if (!firstName.trim()) {
-      Alert.alert('Error', 'First name is required!');
-      return;
-    }
+    if (!validateInput()) return;
 
-    if (!lastName.trim()) {
-      Alert.alert('Error', 'Last name is required!');
-      return;
-    }
-
-    if (!validateEmail(email)) {
-      Alert.alert('Error', 'Please enter a valid email address!');
-      return;
-    }
-
-    if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters long!');
-      return;
-    }
-
+    setIsLoading(true);
     try {
-      console.log(firstName,lastName,email,password);
-      const response = await fetch('http://192.168.1.5:8080/api/auth/register', {
+      const response = await fetch('http://10.51.12.33:8080/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          firstName: firstName,
-          lastName: lastName,
-          email: email,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          email: email.toLowerCase().trim(),
           password: password,
         }),
       });
 
-      console.log(response);
-
       const data = await response.json();
 
-      if (response.ok) {
-        if (data.success) {
-          Alert.alert('Success', 'Registration successful!');
-          navigation.navigate('signin'); // Redirect to SignIn page
-        } else {
-          Alert.alert('Error', data.message || 'Registration failed.');
-        }
+      if (response.ok && data.success) {
+        Alert.alert(
+          'Success', 
+          'Registration successful! Please sign in.',
+          [{ text: 'OK', onPress: () => router.replace('/(auth)/signin') }]
+        );
       } else {
-        Alert.alert('Error', data.message || 'Server error occurred.');
+        Alert.alert('Error', data.message || 'Registration failed');
       }
     } catch (error) {
-      console.error('Error during sign-up:', error);
-      Alert.alert('Error', 'An error occurred. Please try again later.');
+      console.error('Registration error:', error);
+      Alert.alert(
+        'Error',
+        'Connection failed. Please check your internet connection.'
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
-
-  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -85,6 +95,7 @@ const SignUpScreen = ({ navigation }: { navigation: NavigationProp<any> }) => {
           value={firstName}
           onChangeText={setFirstName}
           autoCapitalize="words"
+          editable={!isLoading}
         />
 
         <TextInput
@@ -94,6 +105,7 @@ const SignUpScreen = ({ navigation }: { navigation: NavigationProp<any> }) => {
           value={lastName}
           onChangeText={setLastName}
           autoCapitalize="words"
+          editable={!isLoading}
         />
 
         <TextInput
@@ -104,7 +116,7 @@ const SignUpScreen = ({ navigation }: { navigation: NavigationProp<any> }) => {
           onChangeText={setEmail}
           autoCapitalize="none"
           keyboardType="email-address"
-          autoComplete="email"
+          editable={!isLoading}
         />
 
         <TextInput
@@ -115,18 +127,24 @@ const SignUpScreen = ({ navigation }: { navigation: NavigationProp<any> }) => {
           onChangeText={setPassword}
           secureTextEntry
           autoCapitalize="none"
+          editable={!isLoading}
         />
 
         <TouchableOpacity 
-          style={styles.signUpButton}
+          style={[styles.signUpButton, isLoading && styles.disabledButton]}
           onPress={handleSignUp}
+          disabled={isLoading}
         >
-          <Text style={styles.buttonText}>Sign Up</Text>
+          {isLoading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Sign Up</Text>
+          )}
         </TouchableOpacity>
 
-        <Link href="/(auth)/signin" style={styles.signInContainer}  relativeToDirectory> 
+        <Link href="/(auth)/signin" style={styles.signInTextContainer}>
           <Text style={styles.signInText}>
-            Already have an account? 
+            Already have an account?
             <Text style={styles.signInLink}> Sign In</Text>
           </Text>
         </Link>
@@ -173,13 +191,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
   },
+  disabledButton: {
+    opacity: 0.7,
+  },
   buttonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
   },
-  signInContainer: {
-    marginTop: 20,
+  signInTextContainer: {
+    marginTop: 25,
   },
   signInText: {
     fontSize: 14,
@@ -188,7 +209,7 @@ const styles = StyleSheet.create({
   signInLink: {
     color: 'black',
     fontWeight: '600',
-  },
+  }
 });
 
 export default SignUpScreen;

@@ -4,7 +4,7 @@ import { useRouter, Href } from 'expo-router';
 
 interface PressableHeaderTextProps {
   text: string;
-  route: Href;  // Using Href type from expo-router
+  route: Href;
   isActive: boolean;
   isElevated: boolean;
   style?: object;
@@ -21,7 +21,7 @@ const PressableHeaderText = ({
 
   return (
     <TouchableOpacity 
-      onPress={() => router.push(route as any)}  // Using type assertion for router.push
+      onPress={() => router.push(route as any)}
       style={[
         styles.container,
         isElevated && styles.elevatedContainer,

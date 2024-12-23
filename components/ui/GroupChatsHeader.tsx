@@ -9,7 +9,6 @@ const GroupChatsHeader = () => {
   const pathname = usePathname();
   const isGroupChatsScreen = pathname.includes('/(tabs)/groupchats');
   
-  // Define routes with Href type
   const chatsRoute: Href = '/(tabs)/chats';
   const groupChatsRoute: Href = '/(tabs)/groupchats';
   const contactsRoute: Href = '/(tabs)/contacts';
@@ -20,14 +19,14 @@ const GroupChatsHeader = () => {
         <PressableHeaderText
           text="Group Chats"
           route={groupChatsRoute}
-          isActive={!isGroupChatsScreen}  // Inactive in group chats screen
+          isActive={!isGroupChatsScreen}
           isElevated={!isGroupChatsScreen}
           style={styles.leftText}
         />
         <PressableHeaderText
           text="Chats"
           route={chatsRoute}
-          isActive={isGroupChatsScreen}  // Active in group chats screen
+          isActive={isGroupChatsScreen}
           isElevated={isGroupChatsScreen}
           style={styles.rightText}
         />

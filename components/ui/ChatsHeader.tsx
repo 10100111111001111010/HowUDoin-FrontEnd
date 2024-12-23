@@ -20,14 +20,14 @@ const ChatsHeader = () => {
         <PressableHeaderText
           text="Chats"
           route={chatsRoute}
-          isActive={!isGroupChatsScreen}  // Active when NOT on group chats
+          isActive={!isGroupChatsScreen}
           isElevated={!isGroupChatsScreen}
           style={styles.leftText}
         />
         <PressableHeaderText
           text="Group Chats"
           route={groupChatsRoute}
-          isActive={isGroupChatsScreen}  // Active when on group chats
+          isActive={isGroupChatsScreen}
           isElevated={isGroupChatsScreen}
           style={styles.rightText}
         />

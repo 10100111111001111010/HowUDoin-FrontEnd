@@ -3,8 +3,8 @@ import { View, StyleSheet, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RelativePathString, useRouter } from 'expo-router';
 import ContactsHeader from '../../components/ui/ContactsHeader';
-import ContactBox from '@/components/ui/ContactBox';
 import SearchBar from '@/components/ui/SearchBar';
+import ContactBox from '@/components/ui/ContactBox';
 
 interface Contact {
   id: string;
