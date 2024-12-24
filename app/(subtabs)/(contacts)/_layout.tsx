@@ -1,12 +1,32 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { Stack } from 'expo-router';
+import { Platform } from 'react-native';
+import AllUsersHeader from '../../../components/ui/AllUsersHeader';
 
-const Contacts = () => {
+export default function RootLayout() {
   return (
-    <View>
-      <Text>Contacts</Text>
-    </View>
-  )
+    <Stack
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#D3C6BA',
+        },
+        contentStyle: { 
+          backgroundColor: '#D3C6BA',
+        },
+        headerShadowVisible: false,
+      }}
+    >
+      <Stack.Screen
+        name="index"
+        options={{
+          header: () => <AllUsersHeader />,
+        }}
+      />
+      <Stack.Screen
+        name="allusers"
+        options={{
+          header: () => <AllUsersHeader />,
+        }}
+      />
+    </Stack>
+  );
 }
-
-export default Contacts

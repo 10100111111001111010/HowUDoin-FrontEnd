@@ -37,7 +37,7 @@ const SignInScreen = () => {
     setIsLoading(true);
     try {
       
-      const response = await fetch('http://10.51.34.42:8080/api/auth/login', {
+      const response = await fetch('http://10.51.12.33:8080/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

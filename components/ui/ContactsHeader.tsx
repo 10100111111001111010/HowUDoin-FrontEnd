@@ -1,20 +1,27 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useRouter } from 'expo-router'
+import { useRouter } from 'expo-router';
 
 const ContactsHeader = () => {
   const router = useRouter();
+
+  const handlePress = () => {
+    router.push('/(subtabs)/(contacts)/allusers');
+  };
 
   return (
     <View style={styles.header}>
       <Text style={styles.headerTitle}>Contacts</Text>
       <TouchableOpacity 
         style={styles.plusButton}
-        onPress={() => router.push('/contacts')}
+        onPress={handlePress}
       >
-        <MaterialIcons name="person-add-alt-1" size={29.5} color="black" />
-        
+        <MaterialIcons 
+          name="person-add-alt-1" 
+          size={29.5} 
+          color="#000000"
+        />
       </TouchableOpacity>
     </View>
   );
@@ -22,7 +29,7 @@ const ContactsHeader = () => {
 
 const styles = StyleSheet.create({
   header: {
-    height : 50,
+    height: 50,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

@@ -19,7 +19,6 @@ export default function TabsLayout() {
             paddingBottom: 5,
             paddingTop: 5,
             height: 60,
-            // Remove marginBottom completely
           },
           tabBarInactiveTintColor: colorScheme === 'dark' ? '#888888' : '#000000',
           tabBarActiveTintColor: '#007AFF',

@@ -48,7 +48,7 @@ const SignUpScreen = () => {
 
     setIsLoading(true);
     try {
-      const response = await fetch('http://10.51.34.42:8080/api/auth/register', {
+      const response = await fetch('http://10.51.12.33:8080/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
