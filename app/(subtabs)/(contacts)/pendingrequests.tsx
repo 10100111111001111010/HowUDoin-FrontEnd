@@ -26,7 +26,7 @@ const PendingRequests = () => {
     const userToken = await AsyncStorage.getItem('userToken');
     if (!userId || !userToken) throw new Error('User not authenticated');
 
-    const response = await fetch(`http://10.51.12.33:8080/api/friends/requests/pending`, {
+    const response = await fetch(`http://172.20.10.10:8090/api/friends/requests/pending`, {
       headers: {
         'Authorization': `Bearer ${userToken}`,
         'User-Id': userId,
@@ -52,14 +52,16 @@ const PendingRequests = () => {
  const handleAccept = async (requestId: string) => {
    try {
      const userId = await AsyncStorage.getItem('userId');
-     if (!userId) throw new Error('User not authenticated');
+     const userToken = await AsyncStorage.getItem('userToken');
+     if (!userId || !userToken) throw new Error('User not authenticated');
 
-     const response = await fetch(`http://10.51.12.33:8080/api/friends/accept/${requestId}`, {
+     const response = await fetch(`http://172.20.10.10:8090/api/friends/accept/${requestId}`, {
        method: 'POST',
        headers: {
-         'User-Id': userId,
-         'Content-Type': 'application/json'
-       }
+        'Authorization': `Bearer ${userToken}`,
+        'User-Id': userId,
+        'Content-Type': 'application/json',
+      },
      });
 
      if (!response.ok) throw new Error('Failed to accept request');
@@ -72,45 +74,72 @@ const PendingRequests = () => {
  const handleDecline = async (requestId: string) => {
    try {
      const userId = await AsyncStorage.getItem('userId');
-     if (!userId) throw new Error('User not authenticated');
+     const userToken = await AsyncStorage.getItem('userToken');
+     if (!userId || !userToken) throw new Error('User not authenticated');
 
-     const response = await fetch(`http://10.51.12.33:8080/api/friends/requests/${requestId}`, {
+     /*const response = await fetch(`http://172.20.10.10:8090/api/friends/requests/${requestId}`, {
        method: 'DELETE',
        headers: {
-         'User-Id': userId,
-         'Content-Type': 'application/json'
-       }
+        'Authorization': `Bearer ${userToken}`,
+        'User-Id': userId,
+        'Content-Type': 'application/json',
+      },
      });
 
-     if (!response.ok) throw new Error('Failed to decline request');
+     if (!response.ok) throw new Error('Failed to decline request'); */
      setRequests(requests.filter(req => req.id !== requestId));
    } catch (err) {
      setError(err instanceof Error ? err.message : 'An unknown error occurred');
    }
  };
 
- const RequestItem = ({ item }: { item: FriendRequest }) => (
-   <View style={styles.requestItem}>
-     <View style={styles.userInfo}>
-       <Text style={styles.userName}>{item.senderId}</Text>
-       <Text style={styles.requestDate}>
-         {new Date(item.createdAt).toLocaleDateString()}
-       </Text>
-     </View>
-     <View style={styles.buttonsContainer}>
-       <TouchableOpacity 
-         style={[styles.button, styles.acceptButton]}
-         onPress={() => handleAccept(item.id)}>
-         <Text style={styles.buttonText}>Accept</Text>
-       </TouchableOpacity>
-       <TouchableOpacity 
-         style={[styles.button, styles.declineButton]}
-         onPress={() => handleDecline(item.id)}>
-         <Text style={styles.buttonText}>Decline</Text>
-       </TouchableOpacity>
-     </View>
-   </View>
- );
+ const RequestItem = ({ item }: { item: FriendRequest }) => {
+  const [user, setUser] = useState<any | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userToken = await AsyncStorage.getItem('userToken');
+        const response = await fetch(`http://172.20.10.10:8090/api/users/${item.senderId}`, {
+          headers: {
+            'Authorization': `Bearer ${userToken}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        const data = await response.json();
+        setUser(data);
+      } catch {
+        setUser(null);
+      }
+    };
+
+    fetchUser();
+  }, [item.senderId]);
+
+  return (
+    <View style={styles.requestItem}>
+      <View style={styles.userInfo}>
+        <Text style={styles.userName}>{user?.firstName} {user?.lastName}</Text>
+        <Text style={styles.requestDate}>
+          {new Date(item.createdAt).toLocaleDateString()}
+        </Text>
+      </View>
+      <View style={styles.buttonsContainer}>
+        <TouchableOpacity 
+          style={[styles.button, styles.acceptButton]}
+          onPress={() => handleAccept(item.id)}>
+          <Text style={styles.buttonText}>Accept</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.button, styles.declineButton]}
+          onPress={() => handleDecline(item.id)}>
+          <Text style={styles.buttonText}>Decline</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
 
  if (loading) {
    return (
