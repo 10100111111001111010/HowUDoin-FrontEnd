@@ -1,5 +1,4 @@
 import { Stack } from 'expo-router';
-import { Platform } from 'react-native';
 import AllUsersHeader from '../../../components/ui/AllUsersHeader';
 
 export default function RootLayout() {
@@ -25,6 +24,12 @@ export default function RootLayout() {
         name="allusers"
         options={{
           header: () => <AllUsersHeader />,
+        }}
+      />
+      <Stack.Screen
+        name="pendingrequests"
+        options={{
+          headerShown: false,
         }}
       />
     </Stack>

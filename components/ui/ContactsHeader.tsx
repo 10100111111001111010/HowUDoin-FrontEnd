@@ -1,28 +1,74 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import Octicons from '@expo/vector-icons/Octicons';
 import { useRouter } from 'expo-router';
-
+import { useAuth } from '../../app/(auth)/_layout';
 const ContactsHeader = () => {
   const router = useRouter();
+  const { user } = useAuth();
+  const [hasPendingRequests, setHasPendingRequests] = useState(false);
+
+  useEffect(() => {
+    const checkPendingRequests = async () => {
+      try {
+        const response = await fetch(`/api/friends/pending/${user.id}`);
+        if (!response.ok) throw new Error('Failed to fetch pending requests');
+        const requests = await response.json();
+        setHasPendingRequests(requests.length > 0);
+      } catch (error) {
+        console.error('Error checking pending requests:', error);
+      }
+    };
+
+    if (user?.id) {
+      checkPendingRequests();
+      const interval = setInterval(checkPendingRequests, 15000); // Check every 15 seconds
+      return () => clearInterval(interval);
+    }
+  }, [user?.id]);
 
   const handlePress = () => {
     router.push('/(subtabs)/(contacts)/allusers');
   };
 
+  const handleNotification = () => {
+      router.push('/(subtabs)/(contacts)/pendingrequests');
+  };
+
   return (
     <View style={styles.header}>
       <Text style={styles.headerTitle}>Contacts</Text>
-      <TouchableOpacity 
-        style={styles.plusButton}
-        onPress={handlePress}
-      >
-        <MaterialIcons 
-          name="person-add-alt-1" 
-          size={29.5} 
-          color="#000000"
-        />
-      </TouchableOpacity>
+      <View style={styles.iconContainer}>
+        <TouchableOpacity 
+          style={styles.iconButton}
+          onPress={handleNotification}
+        >
+          <View style={styles.notificationContainer}>
+            <Octicons
+              name="bell"
+              margin={-8}
+              marginTop={1} 
+              size={24} 
+              color={hasPendingRequests ? "#FF4B4B" : "#000000"}
+            />
+            {hasPendingRequests && (
+              <View style={styles.notificationDot} />
+            )}
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.iconButton}
+          onPress={handlePress}
+        >
+          <MaterialIcons 
+            name="person-add-alt-1" 
+            size={28} 
+            color="#000000"
+          />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -43,8 +89,25 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: 'bold',
   },
-  plusButton: {
+  iconContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconButton: {
     padding: 8,
+    marginLeft: 4,
+  },
+  notificationContainer: {
+    position: 'relative',
+  },
+  notificationDot: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#FF4B4B',
   },
 });
 
