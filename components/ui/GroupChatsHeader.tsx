@@ -11,7 +11,7 @@ const GroupChatsHeader = () => {
   
   const chatsRoute: Href = '/(tabs)/chats';
   const groupChatsRoute: Href = '/(tabs)/groupchats';
-  const contactsRoute: Href = '/(tabs)/contacts';
+  const createGroupChatRoute: Href = '/(subtabs)/(chats)/creategroupchat';
   
   return (
     <View style={styles.header}>
@@ -33,11 +33,13 @@ const GroupChatsHeader = () => {
       </View>
 
       <TouchableOpacity 
-        style={styles.plusButton}
-        onPress={() => router.push(contactsRoute as any)}
-      >
-        <Feather name="plus-circle" size={25} color="black" />
-      </TouchableOpacity>
+  style={styles.plusButton}
+  onPress={() => {
+    router.push(createGroupChatRoute as any);
+  }}
+>
+  <Feather name="plus-circle" size={25} color="black" />
+</TouchableOpacity>
     </View>
   );
 };

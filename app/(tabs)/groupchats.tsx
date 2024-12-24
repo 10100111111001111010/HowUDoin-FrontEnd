@@ -68,31 +68,6 @@ const GroupChats = () => {
       unreadCount: 0,
       status: 'DELIVERED'
     },
-    {
-      id: '7',
-      name: 'Alice',
-      lastMessage: 'Hey',
-      timestamp: 'Today',
-      unreadCount: 0,
-      status: 'DELIVERED'
-    },
-    {
-      id: '8',
-      name: 'Eve',
-      lastMessage: 'Hey',
-      timestamp: 'Today',
-      unreadCount: 0,
-      status: 'DELIVERED'
-    },
-    {
-      id: '9',
-      name: 'Adam',
-      lastMessage: 'Hi',
-      timestamp: 'Today',
-      unreadCount: 0,
-      status: 'DELIVERED'
-    },
-
   ]);
 
   const handleChatPress = (chatId: string) => {
