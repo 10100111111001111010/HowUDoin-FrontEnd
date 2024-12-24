@@ -10,7 +10,7 @@ const AllUsersHeader = () => {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
         <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>
-          Find friends to start chatting!
+          Find your friends to start chatting!
         </Text>
       </View>
     </SafeAreaView>
