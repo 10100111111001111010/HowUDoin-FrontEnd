@@ -1,89 +1,66 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RelativePathString, useRouter } from 'expo-router';
 import ContactsHeader from '../../components/ui/ContactsHeader';
 import SearchBar from '@/components/ui/SearchBar';
 import ContactBox from '@/components/ui/ContactBox';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+ 
 interface Contact {
   id: string;
   name: string;
 }
-
+ 
 const Contacts = () => {
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const [contacts] = useState<Contact[]>([
-    {
-      id: '1',
-      name: 'Nusret',
-    },
-    {
-      id: '2',
-      name: 'Ahmet',
-    },
-    {
-      id: '3',
-      name: 'Thiam',
-    },
-    {
-      id: '4',
-      name: 'Dries',
-    },
-    {
-      id: '5',
-      name: 'Ciro',
-    },
-    {
-      id: '6',
-      name: 'Bob',
-    },
-    {
-      id: '7',
-      name: 'Alice',
-    },
-    {
-      id: '8',
-      name: 'Eve',
-    },
-    {
-      id: '9',
-      name: 'Adam',
-    },
-  ]);
-
+ 
+  const [contacts,setContacts] = useState<any>(
+ 
+  );
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userToken = await AsyncStorage.getItem('userToken');
+        const userId = await AsyncStorage.getItem('userId');
+        const response = await fetch(`http://172.20.10.10:8090/api/friends`, {
+          headers: {
+            'Authorization': `Bearer ${userToken}`,
+            'User-Id': userId as string,
+            'Content-Type': 'application/json',
+          },
+        });
+        const data = await response.json();
+        setContacts(data);
+      } catch {
+        setContacts(null);
+      }
+    };
+ 
+    fetchUser();
+  }, []);
+ 
+  
   const handleContactPress = (contactId: string) => {
     const path = `/(subtabs)/(contacts)/${contactId}`;
     router.push(path as RelativePathString);
   };
-
-  const handleSearch = (text: string) => {
-    setSearchQuery(text);
-  };
-
+ 
   const renderItem = ({ item }: { item: Contact }) => (
     <ContactBox
       userId={item.id}
-      name={item.name}
+      name={`${item.firstName} ${item.lastName}`}
       onPress={() => handleContactPress(item.id)}
     />
   );
-
-  const filteredContacts = contacts.filter(contact =>
-    contact.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
+ 
   return (
     <SafeAreaView style={styles.container}>
       <ContactsHeader />
-      <View style={{marginTop: 5, paddingHorizontal: 3}}> 
-        <SearchBar onSearchChange={handleSearch} />
-      </View>
+ 
       <View style={styles.content}>
         <FlatList
-          data={filteredContacts}
+          data={contacts}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           style={styles.list}
@@ -96,7 +73,7 @@ const Contacts = () => {
     </SafeAreaView>
   );
 };
-
+ 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -110,5 +87,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#D3C6BA',
   },
 });
-
+ 
 export default Contacts;
