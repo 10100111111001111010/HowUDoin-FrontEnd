@@ -21,7 +21,7 @@ const CreateGroupChat = () => {
   useEffect(() => {
     fetchContacts();
   }, []);
-
+ 
   const fetchContacts = async () => {
     console.log('Fetching contacts...');
     try {
