@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  TouchableOpacity,
   ActivityIndicator,
   Alert
 } from 'react-native';
@@ -62,7 +61,7 @@ export default function AllUsers() {
       
       if (response.status === 401) {
         // Token is invalid or expired
-        await AsyncStorage.removeItem('token'); // Clear the invalid token
+        await AsyncStorage.removeItem('token');
         Alert.alert(
           'Session Expired',
           'Please log in again to continue',

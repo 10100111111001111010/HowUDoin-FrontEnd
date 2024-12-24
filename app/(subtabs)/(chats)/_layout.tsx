@@ -1,12 +1,15 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { Stack } from 'expo-router';
+import React from 'react';
 
-const Chats = () => {
+export default function ChatsLayout() {
   return (
-    <View>
-      <Text>Chats</Text>
-    </View>
-  )
+    <Stack>
+      <Stack.Screen 
+        name="creategroupchat" 
+        options={{
+          headerShown: false
+        }}
+      />
+    </Stack>
+  );
 }
-
-export default Chats
