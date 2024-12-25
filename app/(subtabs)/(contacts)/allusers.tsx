@@ -19,71 +19,92 @@ interface User {
   email: string;
 }
 
+interface Friend {
+  id: string;
+  userId: string;
+  friendId: string;
+}
+
 export default function AllUsers() {
   const [users, setUsers] = useState<User[]>([]);
+  const [friends, setFriends] = useState<Friend[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    fetchUsers();
+    fetchUsersAndFriends();
   }, []);
 
-  const fetchUsers = async () => {
+  const fetchUsersAndFriends = async () => {
     try {
       const token = await AsyncStorage.getItem('userToken');
+      const userId = await AsyncStorage.getItem('userId');
       
-      // If no token is found, redirect to login
-      if (!token) {
+      if (!token || !userId) {
         Alert.alert(
           'Authentication Required',
           'Please log in to view users',
-          [
-            {
-              text: 'OK',
-              onPress: () => router.push('/signin')
-            }
-          ]
+          [{ text: 'OK', onPress: () => router.push('/signin') }]
         );
         return;
       }
 
-      console.log('Fetching users...');
-      const response = await fetch('http://10.51.12.33:8080/api/users/all', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-      });
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'User-Id': userId
+      };
+
+      // Fetch both users and friends in two display non-friends
+      const [usersResponse, friendsResponse] = await Promise.all([
+        fetch('http://10.51.12.33:8080/api/users/all', {
+          method: 'GET',
+          headers
+        }),
+        fetch('http://10.51.12.33:8080/api/friends/all', {
+          method: 'GET',
+          headers
+        })
+      ]);
       
-      console.log('Response status:', response.status);
-      
-      if (response.status === 401) {
-        // Token is invalid or expired
-        await AsyncStorage.removeItem('token');
+      if (usersResponse.status === 401 || friendsResponse.status === 401) {
+        await AsyncStorage.removeItem('userToken');
         Alert.alert(
           'Session Expired',
           'Please log in again to continue',
-          [
-            {
-              text: 'OK',
-              onPress: () => router.push('/signin')
-            }
-          ]
+          [{ text: 'OK', onPress: () => router.push('/signin') }]
         );
         return;
       }
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error response:', errorText);
-        throw new Error(`Failed to fetch users: ${response.status} ${errorText}`);
+
+      if (!usersResponse.ok || !friendsResponse.ok) {
+        const errorResponse = !usersResponse.ok ? usersResponse : friendsResponse;
+        const errorText = await errorResponse.text();
+        throw new Error(`Failed to fetch data: ${errorResponse.status} ${errorText}`);
       }
       
-      const data = await response.json();
-      console.log('Received data:', data);
-      setUsers(data);
+      const [usersData, friendsData] = await Promise.all([
+        usersResponse.json(),
+        friendsResponse.json()
+      ]);
+      
+      // Filter out users who are already friends and the current user
+      const filteredUsers = usersData.filter((user: User) => {
+        // Don't show current user
+        if (user.id === userId) return false;
+        
+        // Don't show users who are already friends
+        const isFriend = friendsData.some(
+          (friend: User) => friend.id === user.id
+        );
+        
+        return !isFriend;
+      });
+
+      setUsers(filteredUsers);
+      setFriends(friendsData);
+      
     } catch (error) {
       console.error('Fetch error:', error);
       Alert.alert(
@@ -122,7 +143,7 @@ export default function AllUsers() {
       keyExtractor={(item) => item.id}
       contentContainerStyle={styles.listContainer}
       ListEmptyComponent={
-        <Text style={styles.emptyText}>Nothing to see here!</Text>
+        <Text style={styles.emptyText}>No new users to add as friends!</Text>
       }
     />
   );
@@ -140,46 +161,6 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     paddingHorizontal: 16,
-  },
-  userCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  userInfo: {
-    flex: 1,
-  },
-  userName: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  userEmail: {
-    fontSize: 14,
-    color: '#666',
-  },
-  addButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-  },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '500',
   },
   emptyText: {
     textAlign: 'center',

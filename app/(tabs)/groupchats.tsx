@@ -154,7 +154,7 @@ const GroupChats = () => {
         refreshing={loading}
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No groups found</Text>
+            <Text style={styles.emptyText}>You are not a member of a group yet!</Text>
           </View>
         )}
       />
@@ -194,9 +194,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+    marginTop: 300,
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#666',
     textAlign: 'center',
   },
