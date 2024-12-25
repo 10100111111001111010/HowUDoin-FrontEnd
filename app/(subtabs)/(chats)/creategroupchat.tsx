@@ -20,7 +20,7 @@ const CreateGroupChat = () => {
   useEffect(() => {
     fetchContacts();
   }, []);
- 
+
   const fetchContacts = async () => {
     console.log('Fetching contacts...');
     try {
@@ -39,22 +39,22 @@ const CreateGroupChat = () => {
           'User-Id': userId,
           'Authorization': `Bearer ${userToken}`,
           'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       });
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         console.log('Error response:', errorText);
         throw new Error(`Server responded with ${response.status}: ${errorText}`);
       }
-      
+
       const data = await response.json();
       console.log('Fetched contacts:', data);
       const simplifiedContacts = data.map((contact: any) => ({
         id: contact.id,
         firstName: contact.firstName,
-        lastName: contact.lastName
+        lastName: contact.lastName,
       }));
       setContacts(simplifiedContacts);
     } catch (error) {
@@ -65,36 +65,30 @@ const CreateGroupChat = () => {
 
   const toggleMemberSelection = (userId: string) => {
     const newSelection = new Set(selectedMembers);
-    if (newSelection.has(userId)) 
-    {
+    if (newSelection.has(userId)) {
       newSelection.delete(userId);
-    }
-    else
-    {
+    } else {
       newSelection.add(userId);
     }
     setSelectedMembers(newSelection);
   };
 
   const handleCreateGroup = async () => {
-    if (!groupName.trim()) 
-    {
+    if (!groupName.trim()) {
       Alert.alert('Error', 'Please enter a group name');
       return;
     }
 
-    if (selectedMembers.size === 0) 
-    {
-      Alert.alert('Error', 'Please select at least one member');
+    if (selectedMembers.size < 2) {
+      Alert.alert('Error', 'Please select at least two members');
       return;
     }
 
     setIsLoading(true);
     try {
       const userId = await AsyncStorage.getItem('userId');
-      
-      if (!userId) 
-      {
+
+      if (!userId) {
         throw new Error('No user ID found');
       }
 
@@ -102,12 +96,12 @@ const CreateGroupChat = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'User-Id': userId
+          'User-Id': userId,
         },
         body: JSON.stringify({
           name: groupName.trim(),
-          memberIds: Array.from(selectedMembers)
-        })
+          memberIds: Array.from(selectedMembers),
+        }),
       });
 
       if (!response.ok) {
@@ -115,10 +109,12 @@ const CreateGroupChat = () => {
         throw new Error(`Failed to create group: ${errorText}`);
       }
 
-      Alert.alert('Success', 'Group created successfully', [{
-        text: 'OK',
-        onPress: () => router.back()
-      }]);
+      Alert.alert('Success', 'Group created successfully', [
+        {
+          text: 'OK',
+          onPress: () => router.back(),
+        },
+      ]);
     } catch (error) {
       console.error('Create group error:', error);
       Alert.alert('Error', 'Failed to create group');
@@ -128,6 +124,16 @@ const CreateGroupChat = () => {
   };
 
   const renderContent = () => {
+    if (!groupName.trim()) {
+      return (
+        <View style={styles.emptyStateContainer}>
+          <Text style={styles.noContactsSubtext}>
+            Please enter a group name to see members.
+          </Text>
+        </View>
+      );
+    }
+
     if (contacts.length === 0) {
       return (
         <View style={styles.emptyStateContainer}>
@@ -135,7 +141,7 @@ const CreateGroupChat = () => {
           <Text style={styles.noContactsSubtext}>
             You have no friends to create a group yet!
           </Text>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.refreshButton}
             onPress={() => router.push('/(subtabs)/(contacts)/allusers')}
             testID="addFriendsButton"
@@ -145,10 +151,6 @@ const CreateGroupChat = () => {
         </View>
       );
     }
-  
-    function handleContactSelect(id: string): void {
-      throw new Error('Function not implemented.');
-    }
 
     return (
       <>
@@ -157,16 +159,18 @@ const CreateGroupChat = () => {
         </Text>
         <ScrollView style={styles.memberList}>
           {contacts.map((contact) => (
-            <TouchableOpacity 
-              key={contact.id} 
+            <TouchableOpacity
+              key={contact.id}
               style={[
                 styles.memberItem,
-                selectedMembers.has(contact.id) && styles.selectedMember
+                selectedMembers.has(contact.id) && styles.selectedMember,
               ]}
-              onPress={() => handleContactSelect(contact.id)}
+              onPress={() => toggleMemberSelection(contact.id)}
               testID={`memberItem-${contact.id}`}
             >
-              <Text style={styles.memberName}>{contact.firstName} {contact.lastName}</Text>
+              <Text style={styles.memberName}>
+                {contact.firstName} {contact.lastName}
+              </Text>
               {selectedMembers.has(contact.id) && (
                 <Feather name="check" size={20} color="#2ecc71" />
               )}
@@ -176,11 +180,11 @@ const CreateGroupChat = () => {
       </>
     );
   };
-  
+
   return (
     <View style={styles.container}>
       <CreateGroupHeader />
-      
+
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -194,19 +198,27 @@ const CreateGroupChat = () => {
 
       {renderContent()}
 
-      <TouchableOpacity 
-      style={[
-        styles.createButton,
-        (isLoading || !groupName.trim() || selectedMembers.size === 0 || contacts.length === 0) && 
-        styles.disabledButton
-      ]}
-      onPress={handleCreateGroup}
-      disabled={isLoading || !groupName.trim() || selectedMembers.size === 0 || contacts.length === 0}
-      testID="createGroupButton"
+      <TouchableOpacity
+        style={[
+          styles.createButton,
+          (isLoading ||
+            !groupName.trim() ||
+            selectedMembers.size < 2 ||
+            contacts.length === 0) &&
+            styles.disabledButton,
+        ]}
+        onPress={handleCreateGroup}
+        disabled={
+          isLoading ||
+          !groupName.trim() ||
+          selectedMembers.size < 2 ||
+          contacts.length === 0
+        }
+        testID="createGroupButton"
       >
-      <Text style={styles.createButtonText}>
-        {isLoading ? 'Creating...' : 'Create Group'}
-      </Text>
+        <Text style={styles.createButtonText}>
+          {isLoading ? 'Creating...' : 'Create Group'}
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -218,13 +230,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#D3C6BA',
   },
   inputContainer: {
-    padding: 16,
+    padding: 12,
     backgroundColor: '#D3C6BA',
   },
   input: {
     borderWidth: 1,
     borderColor: '#E0E0E0',
-    borderRadius: 25,
+    borderRadius: 20,
     padding: 16,
     fontSize: 16,
     backgroundColor: '#FFFFFF',
@@ -243,7 +255,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    padding: 14,
+    paddingHorizontal: 14,
     borderRadius: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
@@ -253,7 +266,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#E8F5E9',
   },
   memberName: {
-    fontSize: 16,
+    fontSize: 18,
+    fontWeight: '400',
     color: 'black',
   },
   emptyStateContainer: {
