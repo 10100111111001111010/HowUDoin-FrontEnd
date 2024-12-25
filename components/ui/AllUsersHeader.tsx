@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, Platform, StatusBar, TouchableOpacity } from 'r
 import React from 'react'
 import { useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const AllUsersHeader = () => {
  const router = useRouter();
@@ -9,15 +10,15 @@ const AllUsersHeader = () => {
  return (
    <SafeAreaView style={styles.safeArea}>
      <View style={styles.header}>
-       <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>
-         Find your friends to start chatting!
-       </Text>
-       <TouchableOpacity 
-         onPress={() => router.back()}
-         style={styles.backButton}
-       >
-         <Text style={styles.backText}>Back</Text>
-       </TouchableOpacity>
+      <TouchableOpacity 
+      onPress={() => router.back()}
+      style={styles.backButton}
+      >
+        <Ionicons name="arrow-back-circle-outline" size={24} color="#000" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>
+          Find your friends to start chatting!
+          </Text>  
      </View>
    </SafeAreaView>
  );
@@ -30,7 +31,7 @@ const styles = StyleSheet.create({
  header: {
    minHeight: 56,
    flexDirection: 'row',
-   justifyContent: 'space-between',
+   justifyContent: 'flex-start',
    alignItems: 'center',
    paddingHorizontal: 16,
    paddingVertical: 8,
@@ -42,8 +43,8 @@ const styles = StyleSheet.create({
  headerTitle: {
    fontSize: 20,
    fontWeight: '500',
-   marginLeft: 0,
    maxWidth: '80%',
+   marginLeft: 10,
    color: '#000000',
  },
  ListContainer: {
@@ -51,12 +52,8 @@ const styles = StyleSheet.create({
    paddingTop: 0,
  },
  backButton: {
-   padding: 8,
+   padding: 4,
  },
- backText: {
-   fontSize: 16,
-   color: '#000',
- }
 });
 
 export default AllUsersHeader;
