@@ -87,6 +87,7 @@ const CreateGroupChat = () => {
     setIsLoading(true);
     try {
       const userId = await AsyncStorage.getItem('userId');
+      const userToken = await AsyncStorage.getItem('userToken');
 
       if (!userId) {
         throw new Error('No user ID found');
@@ -97,6 +98,7 @@ const CreateGroupChat = () => {
         headers: {
           'Content-Type': 'application/json',
           'User-Id': userId,
+          'Authorization': `Bearer ${userToken}`,
         },
         body: JSON.stringify({
           name: groupName.trim(),
@@ -128,7 +130,7 @@ const CreateGroupChat = () => {
       return (
         <View style={styles.emptyStateContainer}>
           <Text style={styles.noContactsSubtext}>
-            Please enter a group name to see members.
+            Please enter a group name to add members.
           </Text>
         </View>
       );
