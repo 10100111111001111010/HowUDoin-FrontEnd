@@ -7,9 +7,8 @@ import CreateGroupHeader from '../../../components/ui/CreateGroupHeader';
 
 interface UserModel {
   id: string;
-  name: string;
-  email: string;
-  imageUrl?: string;
+  firstName: string;
+  lastName: string;
 }
 
 const CreateGroupChat = () => {
@@ -35,7 +34,7 @@ const CreateGroupChat = () => {
         return;
       }
 
-      const response = await fetch('http://10.51.12.33:8080/api/users/all', {
+      const response = await fetch('http://10.51.12.33:8080/api/friends/all', {
         headers: {
           'User-Id': userId,
           'Authorization': `Bearer ${userToken}`,
@@ -52,7 +51,12 @@ const CreateGroupChat = () => {
       
       const data = await response.json();
       console.log('Fetched contacts:', data);
-      setContacts(data);
+      const simplifiedContacts = data.map((contact: any) => ({
+        id: contact.id,
+        firstName: contact.firstName,
+        lastName: contact.lastName
+      }));
+      setContacts(simplifiedContacts);
     } catch (error) {
       console.error('Fetch error:', error);
       Alert.alert('Error', 'Failed to fetch contacts');
@@ -61,21 +65,26 @@ const CreateGroupChat = () => {
 
   const toggleMemberSelection = (userId: string) => {
     const newSelection = new Set(selectedMembers);
-    if (newSelection.has(userId)) {
+    if (newSelection.has(userId)) 
+    {
       newSelection.delete(userId);
-    } else {
+    }
+    else
+    {
       newSelection.add(userId);
     }
     setSelectedMembers(newSelection);
   };
 
   const handleCreateGroup = async () => {
-    if (!groupName.trim()) {
+    if (!groupName.trim()) 
+    {
       Alert.alert('Error', 'Please enter a group name');
       return;
     }
 
-    if (selectedMembers.size === 0) {
+    if (selectedMembers.size === 0) 
+    {
       Alert.alert('Error', 'Please select at least one member');
       return;
     }
@@ -84,7 +93,8 @@ const CreateGroupChat = () => {
     try {
       const userId = await AsyncStorage.getItem('userId');
       
-      if (!userId) {
+      if (!userId) 
+      {
         throw new Error('No user ID found');
       }
 
@@ -122,21 +132,24 @@ const CreateGroupChat = () => {
       return (
         <View style={styles.emptyStateContainer}>
           <Feather name="users" size={50} color="#666" />
-          <Text style={styles.noContactsText}>No contacts available</Text>
           <Text style={styles.noContactsSubtext}>
-            You need at least one contact to create a group
+            You have no friends to create a group yet!
           </Text>
           <TouchableOpacity 
             style={styles.refreshButton}
-            onPress={fetchContacts}
-            testID="refreshContactsButton"
+            onPress={() => router.push('/(subtabs)/(contacts)/allusers')}
+            testID="addFriendsButton"
           >
-            <Text style={styles.refreshButtonText}>Refresh Contacts</Text>
+            <Text style={styles.refreshButtonText}>Add Friends</Text>
           </TouchableOpacity>
         </View>
       );
     }
   
+    function handleContactSelect(id: string): void {
+      throw new Error('Function not implemented.');
+    }
+
     return (
       <>
         <Text style={styles.sectionTitle}>
@@ -150,10 +163,10 @@ const CreateGroupChat = () => {
                 styles.memberItem,
                 selectedMembers.has(contact.id) && styles.selectedMember
               ]}
-              onPress={() => toggleMemberSelection(contact.id)}
+              onPress={() => handleContactSelect(contact.id)}
               testID={`memberItem-${contact.id}`}
             >
-              <Text style={styles.memberName}>{contact.name}</Text>
+              <Text style={styles.memberName}>{contact.firstName} {contact.lastName}</Text>
               {selectedMembers.has(contact.id) && (
                 <Feather name="check" size={20} color="#2ecc71" />
               )}
@@ -234,13 +247,14 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
+    backgroundColor: '#FFFFFF',
   },
   selectedMember: {
     backgroundColor: '#E8F5E9',
   },
   memberName: {
     fontSize: 16,
-    color: '#333',
+    color: 'black',
   },
   emptyStateContainer: {
     flex: 1,
@@ -248,14 +262,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
   },
-  noContactsText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#666',
-    marginTop: 16,
-  },
   noContactsSubtext: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#888',
     textAlign: 'center',
     marginTop: 8,
