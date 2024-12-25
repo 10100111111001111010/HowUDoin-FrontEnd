@@ -1,37 +1,22 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
-interface GroupChatBoxProps {
+interface ChatBoxProps {
   chatId: string;
   name: string;
   lastMessage: string;
   timestamp: string;
-  unreadCount?: number;
+  unreadCount: number;
   onPress?: () => void;
 }
 
-const GroupChatBox: React.FC<GroupChatBoxProps> = ({
+const GroupChatBox: React.FC<ChatBoxProps> = ({
   name,
   lastMessage,
   timestamp,
   unreadCount = 0,
-  status,
   onPress
 }) => {
-  const renderStatusIcon = () => {
-    switch (status) {
-      case 'SENT':
-        return <Ionicons name="checkmark" size={16} color="#666" />;
-      case 'DELIVERED':
-        return <Ionicons name="checkmark-done" size={16} color="#666" />;
-      case 'READ':
-        return <Ionicons name="checkmark-done" size={16} color="#007AFF" />;
-      default:
-        return null;
-    }
-  };
-
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
       {/* Avatar Circle */}
@@ -47,18 +32,15 @@ const GroupChatBox: React.FC<GroupChatBoxProps> = ({
         </View>
 
         <View style={styles.messageContainer}>
-          <View style={styles.messageContent}>
-            {renderStatusIcon()}
-            <Text style={styles.lastMessage} numberOfLines={1}>
-              {lastMessage}
-            </Text>
-          </View>
+          <Text style={styles.lastMessage} numberOfLines={1}>
+            {lastMessage}
+          </Text>
           
           <View style={styles.rightContainer}>            
             {unreadCount > 0 && (
               <View style={styles.badge}>
                 <Text style={styles.badgeText}>
-                  {unreadCount > 99 ? '99+' : unreadCount}
+                  {unreadCount}
                 </Text>
               </View>
             )}
@@ -114,17 +96,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 6,
   },
-  messageContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-    marginRight: 8,
-  },
   lastMessage: {
     fontSize: 15,
     color: '#666',
     flex: 1,
-    marginLeft: 4,
+    marginRight: 8,
   },
   rightContainer: {
     flexDirection: 'row',

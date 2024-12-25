@@ -3,27 +3,27 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 interface ContactBoxProps {
   userId: string;
-  name: string;
-
+  firstName: string;
+  lastName: string;
   onPress?: () => void;
 }
 
 const ContactBox: React.FC<ContactBoxProps> = ({
-  name,
+  firstName,
+  lastName,
   onPress
 }) => {
+  const fullName = `${firstName} ${lastName}`;
+  const initials = `${firstName[0]}${lastName[0]}`;
+
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
-      {}
       <View style={styles.avatar}>
-        <Text style={styles.avatarText}>{name[0]}</Text>
+        <Text style={styles.avatarText}>{initials}</Text>
       </View>
 
-      {}
       <View style={styles.content}>
-        <View style={styles.header}>
-          <Text style={styles.name}>{name}</Text>
-        </View>
+        <Text style={styles.name}>{fullName}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -36,6 +36,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#D3C6BA',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5E5',
+    alignItems: 'center',
   },
   avatar: {
     width: 48,
@@ -54,13 +55,8 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 12,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
   name: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '500',
     color: '#000',
   },
