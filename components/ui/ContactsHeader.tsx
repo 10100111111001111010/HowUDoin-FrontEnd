@@ -5,6 +5,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Octicons from '@expo/vector-icons/Octicons';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../app/(auth)/_layout';
+
 const ContactsHeader = () => {
   const router = useRouter();
   const { user } = useAuth();
@@ -12,11 +13,25 @@ const ContactsHeader = () => {
 
   useEffect(() => {
     const checkPendingRequests = async () => {
+      if (!user?.id) return;
+      
       try {
-        const response = await fetch(`/api/friends/pending/${user.id}`);
-        if (!response.ok) throw new Error('Failed to fetch pending requests');
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/friends/all', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (!response.ok) {
+          console.error('Server error:', response.status);
+          return;
+        }
+        
         const requests = await response.json();
-        setHasPendingRequests(requests.length > 0);
+        setHasPendingRequests(Array.isArray(requests) && requests.length > 0);
       } catch (error) {
         console.error('Error checking pending requests:', error);
       }
@@ -24,7 +39,7 @@ const ContactsHeader = () => {
 
     if (user?.id) {
       checkPendingRequests();
-      const interval = setInterval(checkPendingRequests, 15000); // Check every 15 seconds
+      const interval = setInterval(checkPendingRequests, 15000);
       return () => clearInterval(interval);
     }
   }, [user?.id]);
@@ -34,7 +49,7 @@ const ContactsHeader = () => {
   };
 
   const handleNotification = () => {
-      router.push('/(subtabs)/(contacts)/pendingrequests');
+    router.push('/(subtabs)/(contacts)/pendingrequests');
   };
 
   return (
