@@ -1,6 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity, Settings } from 'react-native'
 import React from 'react'
-import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 
 const SettingsHeader = () => {

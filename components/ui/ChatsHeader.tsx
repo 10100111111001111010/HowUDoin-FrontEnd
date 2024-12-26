@@ -9,7 +9,6 @@ const ChatsHeader = () => {
   const pathname = usePathname();
   const isGroupChatsScreen = pathname.includes('/(tabs)/groupchats');
   
-  // Define routes with Href type
   const chatsRoute: Href = '/(tabs)/chats';
   const groupChatsRoute: Href = '/(tabs)/groupchats';
   const contactsRoute: Href = '/(tabs)/contacts';

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Octicons from '@expo/vector-icons/Octicons';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../app/(auth)/_layout';

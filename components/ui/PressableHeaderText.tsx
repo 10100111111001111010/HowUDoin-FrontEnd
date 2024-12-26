@@ -1,4 +1,4 @@
-import { Text, TouchableOpacity, StyleSheet, Platform, View } from 'react-native';
+import { Text, TouchableOpacity, StyleSheet, Platform} from 'react-native';
 import React from 'react';
 import { useRouter, Href } from 'expo-router';
 
