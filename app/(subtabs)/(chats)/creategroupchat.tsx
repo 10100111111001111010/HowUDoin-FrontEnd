@@ -252,6 +252,8 @@ const styles = StyleSheet.create({
   },
   memberList: {
     flex: 1,
+    padding: 12,
+    paddingHorizontal: 20,
   },
   memberItem: {
     flexDirection: 'row',
@@ -262,6 +264,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
+    marginBottom: 4,
     backgroundColor: '#FFFFFF',
   },
   selectedMember: {
