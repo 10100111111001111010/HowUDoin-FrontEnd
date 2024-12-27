@@ -56,7 +56,6 @@ export default function AllUsers() {
         'User-Id': userId
       };
 
-      // Fetch both users and friends in two display non-friends
       const [usersResponse, friendsResponse] = await Promise.all([
         fetch('http://192.168.1.156:8080/api/users/all', {
           method: 'GET',

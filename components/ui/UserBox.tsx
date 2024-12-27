@@ -35,7 +35,7 @@ const UserBox: React.FC<UserBoxProps> = ({
       const token = await AsyncStorage.getItem('userToken');
       if (!token) return;
 
-      const response = await fetch(`http://10.51.12.33:8080/api/friends/status/${id}`, {
+      const response = await fetch(`http://192.168.1.156:8080/api/friends/status/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -66,7 +66,7 @@ const UserBox: React.FC<UserBoxProps> = ({
         return;
       }
 
-      const response = await fetch(`http://10.51.12.33:8080/api/friends/add/${id}`, {
+      const response = await fetch(`http://192.168.1.156:8080/api/friends/add/${id}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

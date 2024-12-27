@@ -14,7 +14,7 @@ const ChatScreenHeader = ({ name }: ChatScreenHeaderProps) => {
   return (
     <View style={styles.header}>
       <TouchableOpacity 
-        onPress={() => router.back()}
+        onPress={() => router.navigate('/chats')}
         style={styles.backButton}
       >
         <Ionicons name="arrow-back-circle-outline" size={24} color="#000" />

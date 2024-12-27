@@ -13,7 +13,7 @@ const GroupChatHeader = ({ groupName }: GroupChatHeaderProps) => {
   return (
     <View style={styles.header}>
       <TouchableOpacity 
-        onPress={() => router.back()}
+        onPress={() => router.navigate('/groupchats')}
         style={styles.backButton}
       >
         <Ionicons name="arrow-back-circle-outline" size={24} color="#000" />

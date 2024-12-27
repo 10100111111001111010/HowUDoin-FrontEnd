@@ -86,9 +86,10 @@ const Settings = () => {
   const handlePress = (route: SettingsRoute) => {
     if (route === 'sign-out') {
       handleSignOut();
-    } else {
-      router.push(`/(subtabs)/(settings)/${route}` as const);
-    }
+    } 
+    // else {
+    //   router.push(`/(subtabs)/(settings)/${route}` as const);
+    // }
   };
 
   return (

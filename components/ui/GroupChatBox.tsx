@@ -1,31 +1,96 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Entypo from '@expo/vector-icons/Entypo';
 import { RelativePathString, useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface ChatBoxProps {
   chatId: string;
   name: string;
-  lastMessage: string;
   timestamp: string;
   unreadCount: number;
   onPress?: () => void;
 }
 
+interface GroupMessage {
+  id: string;
+  groupId: string;
+  senderId: string;
+  content: string;
+  createdAt: string;
+}
+
 const GroupChatBox: React.FC<ChatBoxProps> = ({
   chatId,
   name,
-  lastMessage,
   timestamp,
   unreadCount = 0,
   onPress
 }) => {
   const router = useRouter();
+  const [lastMessage, setLastMessage] = useState<string>('');
 
   const handleMessage = () => {
     console.log('chatBoxChatId', chatId);
     router.push(`/(subtabs)/(chats)/(groupchat)/${chatId}?name=${name}` as RelativePathString);
   };
+
+  useEffect(() => {
+    const loadInitialMessages = async () => {
+      await fetchGroupMessages();
+    }
+    
+    loadInitialMessages();
+  }, [lastMessage])
+
+  const fetchGroupMessages = async () => {
+    const userId = await AsyncStorage.getItem('userId');
+    const userToken = await AsyncStorage.getItem('userToken');
+    const request = await fetch(`http://192.168.1.156:8080/api/groups/${chatId}/messages`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${userToken}`,
+        'User-Id': `${userId}`
+      }
+    });
+
+    const response = await request.json();
+
+    console.log('groupchatbox', response);
+
+    const messages = response.content;
+
+    messages.sort((a : GroupMessage, b : GroupMessage) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+
+    messages.reverse();
+
+    var latestMessage = messages[0];
+    
+    let prefix = 'You: '
+
+    if (lastMessage !== null) {
+      if (latestMessage.senderId === userId) {
+      
+        console.log('message content: ', latestMessage.content);
+        setLastMessage(`${prefix} ${latestMessage.content}`)
+      } else {
+        const userRequest = await fetch(`http://192.168.1.156:8080/api/users/${latestMessage.senderId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userToken}`
+          }
+        })
+
+        const userResponse = await userRequest.json();
+
+        prefix = `${userResponse.firstName}:`;
+
+        setLastMessage(`${prefix} ${latestMessage.content}`);
+      }
+    }
+  }
 
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
@@ -123,10 +188,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 6,
+    marginTop: 4,
   },
   lastMessage: {
-    fontSize: 15,
+    fontSize: 16,
     color: '#666',
     flex: 1,
     marginRight: 8,

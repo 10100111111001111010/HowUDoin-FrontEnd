@@ -167,7 +167,7 @@ const Chats = () => {
           hour: '2-digit', 
           minute: '2-digit' 
         })}
-        unreadCount={item.senderId !== userId && item.status !== 'READ' ? 1 : 0}
+        unreadCount={0}
         status={item.status}
         onPress={() => handleChatPress(item.id, otherUserId, userName)}
       />
