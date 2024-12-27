@@ -43,7 +43,7 @@ const GroupChat = () => {
   
       const requests = userNamesToFetch.map(async (userId) => {
         const userToken = await AsyncStorage.getItem('userToken');
-        const req = await fetch('http://172.20.10.10:8090/api/users/' + userId, {
+        const req = await fetch('http://192.168.1.156:8080/api/users/' + userId, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -79,7 +79,7 @@ const GroupChat = () => {
 
       setUserId(currentUserId);
 
-      const request = await fetch('http://172.20.10.10:8090/api/groups/' + id + '/messages', {
+      const request = await fetch('http://192.168.1.156:8080/api/groups/' + id + '/messages', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -146,7 +146,7 @@ const GroupChat = () => {
         return;
       }
 
-      const request = await fetch('http://172.20.10.10:8090/api/groups/' + id + '/send', {
+      const request = await fetch('http://192.168.1.156:8080/api/groups/' + id + '/send', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

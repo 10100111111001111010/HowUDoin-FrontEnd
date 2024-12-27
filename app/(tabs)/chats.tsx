@@ -1,4 +1,3 @@
-// Chats.tsx
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -27,6 +26,7 @@ const Chats = () => {
   useEffect(() => {
     const loadInitialData = async () => {
       const storedUserId = await AsyncStorage.getItem('userId');
+      console.log('Stored userId:', storedUserId);
       if (storedUserId) {
         setUserId(storedUserId);
         await fetchChats();
@@ -48,13 +48,13 @@ const Chats = () => {
     try {
       const userToken = await AsyncStorage.getItem('userToken');
       const userId = await AsyncStorage.getItem('userId');
-
+  
       if (!userToken || !userId) {
-        console.log("User token or ID not found");
+        console.log("Missing credentials:", { userToken: !!userToken, userId: !!userId });
         return;
       }
-
-      const request = await fetch('http://172.20.10.10:8090/api/messages', {
+  
+      const request = await fetch('http://192.168.1.156:8080/api/messages/all?page=0&size=20', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -62,13 +62,22 @@ const Chats = () => {
           'User-Id': userId
         }
       });
-
+  
       if (!request.ok) {
+        const errorText = await request.text();
+        console.error('Error response:', errorText);
         throw new Error(`Failed to fetch chats: ${request.status}`);
       }
-
+  
       const response = await request.json();
-      setChats(response);
+      console.log('Fetched chats:', response);
+      
+      if (Array.isArray(response)) {
+        setChats(response);
+      } else {
+        console.error('Unexpected response format:', response);
+        setChats([]);
+      }
     } catch (error) {
       console.error('Error fetching chats:', error);
     }
@@ -91,7 +100,7 @@ const Chats = () => {
 
     try {
       const requests = userNamesToFetch.map(async (id) => {
-        const response = await fetch(`http://172.20.10.10:8090/api/users/${id}`, {
+        const response = await fetch(`http://192.168.1.156:8080/api/users/${id}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -142,17 +151,7 @@ const Chats = () => {
   };
 
   const handleChatPress = (messageId: string, chatId: string, userName: string) => {
-    // const path = `/(subtabs)/(chats)/${messageId}`;
-    // router.push({
-    //   pathname: path as RelativePathString,
-    //   params: { 
-    //     id: messageId,  // mesaj ID'si
-    //     chatId: chatId, // karşı tarafın user ID'si
-    //     name: userName 
-    //   }
-    // });
-    console.log('messageId', messageId);
-    router.push(`/(subtabs)/(chats)/${messageId}?name=${userName}` as RelativePathString);
+    router.push(`/(subtabs)/(chats)/(chat)/${chatId}?name=${userName}` as RelativePathString);
   };
 
   const renderItem = ({ item }: { item: Chat }) => {

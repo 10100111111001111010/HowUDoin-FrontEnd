@@ -64,7 +64,7 @@ const GroupDetails: React.FC<GroupDetailsProps> = ({ groupId }) => {
         throw new Error('Authentication required');
       }
   
-      const groupResponse = await fetch(`http://10.51.12.33:8080/api/groups/${groupId}`, {
+      const groupResponse = await fetch(`http://192.168.1.156:8080/api/groups/${groupId}`, {
         headers: {
           'User-Id': userId,
           'Authorization': `Bearer ${userToken}`,
@@ -79,7 +79,7 @@ const GroupDetails: React.FC<GroupDetailsProps> = ({ groupId }) => {
       const groupData = await groupResponse.json();
       console.log('Group Data:', groupData);
   
-      const membersResponse = await fetch(`http://10.51.12.33:8080/api/groups/${groupId}/members`, {
+      const membersResponse = await fetch(`http://192.168.1.156:8080/api/groups/${groupId}/members`, {
         headers: {
           'User-Id': userId,
           'Authorization': `Bearer ${userToken}`,

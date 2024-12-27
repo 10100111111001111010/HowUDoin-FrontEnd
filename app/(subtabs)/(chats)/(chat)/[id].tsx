@@ -47,7 +47,7 @@ const Chat = () => {
 
       setUserId(currentUserId);
 
-      const request = await fetch('http://172.20.10.10:8090/api/messages/conversation/' + id, {
+      const request = await fetch('http://192.168.1.156:8080/api/messages/conversation/' + id, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -88,7 +88,7 @@ const Chat = () => {
       }
 
       // API'ye mesajı gönder
-      const request = await fetch('http://172.20.10.10:8090/api/messages/send/' + id, {
+      const request = await fetch('http://192.168.1.156:8080/api/messages/send/' + id, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -34,7 +34,7 @@ const CreateGroupChat = () => {
         return;
       }
 
-      const response = await fetch('http://10.51.12.33:8080/api/friends/all', {
+      const response = await fetch('http://192.168.1.156:8080/api/friends/all', {
         headers: {
           'User-Id': userId,
           'Authorization': `Bearer ${userToken}`,
@@ -93,7 +93,7 @@ const CreateGroupChat = () => {
         throw new Error('No user ID found');
       }
 
-      const response = await fetch('http://10.51.12.33:8080/api/groups/create', {
+      const response = await fetch('http://192.168.1.156:8080/api/groups/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

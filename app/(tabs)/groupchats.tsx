@@ -57,7 +57,7 @@ const GroupChats = () => {
       }
   
       const response = await fetchWithRetry(
-        'http://172.20.10.10:8090/api/groups/my-groups',
+        'http://192.168.1.156:8080/api/groups/my-groups',
         {
           headers: {
             'User-Id': userId,  // Changed from 'userId' to 'User-Id'

@@ -31,7 +31,7 @@ const Contacts = () => {
           return;
         }
 
-        const response = await fetch(`http://10.51.12.33:8080/api/friends/all`, {
+        const response = await fetch(`http://192.168.1.156:8080/api/friends/all`, {
           headers: {
             'Authorization': `Bearer ${userToken}`,
             'User-Id': userId,

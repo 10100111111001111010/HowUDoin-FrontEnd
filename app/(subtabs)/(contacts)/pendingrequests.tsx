@@ -26,7 +26,7 @@ const PendingRequests = () => {
     const userToken = await AsyncStorage.getItem('userToken');
     if (!userId || !userToken) throw new Error('User not authenticated');
 
-    const response = await fetch(`http://10.51.12.33:8080/api/friends/requests/pending`, {
+    const response = await fetch(`http://192.168.1.156:8080/api/friends/requests/pending`, {
       headers: {
         'Authorization': `Bearer ${userToken}`,
         'User-Id': userId,
@@ -55,7 +55,7 @@ const PendingRequests = () => {
      const userToken = await AsyncStorage.getItem('userToken');
      if (!userId || !userToken) throw new Error('User not authenticated');
 
-     const response = await fetch(`http://10.51.12.33:8080/api/friends/accept/${requestId}`, {
+     const response = await fetch(`http://192.168.1.156:8080/api/friends/accept/${requestId}`, {
        method: 'POST',
        headers: {
         'Authorization': `Bearer ${userToken}`,
@@ -100,7 +100,7 @@ const PendingRequests = () => {
     const fetchUser = async () => {
       try {
         const userToken = await AsyncStorage.getItem('userToken');
-        const response = await fetch(`http://10.51.12.33:8080/api/users/${item.senderId}`, {
+        const response = await fetch(`http://192.168.1.156:8080/api/users/${item.senderId}`, {
           headers: {
             'Authorization': `Bearer ${userToken}`,
             'Content-Type': 'application/json',
