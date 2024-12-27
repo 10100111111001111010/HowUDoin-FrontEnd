@@ -4,7 +4,6 @@ import * as SplashScreen from 'expo-splash-screen';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -42,7 +41,6 @@ export default function RootLayout() {
       router.replace('/(auth)/signin');
     }
 
-    // Hide splash screen after navigation is determined
     SplashScreen.hideAsync();
   }, [isReady, isAuthenticated, segments]);
 
