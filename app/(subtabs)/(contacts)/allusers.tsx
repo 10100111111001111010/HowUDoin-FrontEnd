@@ -5,11 +5,13 @@ import {
   StyleSheet,
   FlatList,
   ActivityIndicator,
-  Alert
+  Alert,
+  TextInput
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import UserBox from '@/components/ui/UserBox';
 
 interface User {
@@ -27,13 +29,28 @@ interface Friend {
 
 export default function AllUsers() {
   const [users, setUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [friends, setFriends] = useState<Friend[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchText, setSearchText] = useState('');
   const router = useRouter();
 
   useEffect(() => {
     fetchUsersAndFriends();
   }, []);
+
+  useEffect(() => {
+    if (searchText.trim() === '') {
+      setFilteredUsers(users);
+    } else {
+      const filtered = users.filter(user => 
+        user.firstName.toLowerCase().includes(searchText.toLowerCase()) ||
+        user.lastName.toLowerCase().includes(searchText.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchText.toLowerCase())
+      );
+      setFilteredUsers(filtered);
+    }
+  }, [searchText, users]);
 
   const fetchUsersAndFriends = async () => {
     try {
@@ -88,12 +105,9 @@ export default function AllUsers() {
         friendsResponse.json()
       ]);
       
-      // Filter out users who are already friends and the current user
       const filteredUsers = usersData.filter((user: User) => {
-        // Don't show current user
         if (user.id === userId) return false;
         
-        // Don't show users who are already friends
         const isFriend = friendsData.some(
           (friend: User) => friend.id === user.id
         );
@@ -102,6 +116,7 @@ export default function AllUsers() {
       });
 
       setUsers(filteredUsers);
+      setFilteredUsers(filteredUsers);
       setFriends(friendsData);
       
     } catch (error) {
@@ -136,15 +151,32 @@ export default function AllUsers() {
   }
 
   return (
-    <FlatList
-      data={users}
-      renderItem={renderUser}
-      keyExtractor={(item) => item.id}
-      contentContainerStyle={styles.listContainer}
-      ListEmptyComponent={
-        <Text style={styles.emptyText}>No new users to add as friends!</Text>
-      }
-    />
+    <View style={styles.container}>
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Start searching..."
+          placeholderTextColor="#666"
+          value={searchText}
+          onChangeText={setSearchText}
+        />
+        <Ionicons 
+          name="search" 
+          size={20} 
+          color="#666" 
+          style={styles.searchIcon} 
+        />
+      </View>
+      <FlatList
+        data={filteredUsers}
+        renderItem={renderUser}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.listContainer}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>No new users to add as friends!</Text>
+        }
+      />
+    </View>
   );
 }
 
@@ -167,4 +199,23 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 24,
   },
+  searchContainer: {
+    position: 'relative',
+    marginHorizontal: 16,
+    marginVertical: 6,
+    marginTop: 2,
+    marginBottom: 8,
+  },
+  searchInput: {
+    height: 40,
+    padding: 10,
+    paddingRight: 40,
+    borderRadius: 20,
+    backgroundColor: '#fff',
+  },
+  searchIcon: {
+    position: 'absolute',
+    right: 12,
+    top: 10,
+  }
 });
