@@ -23,7 +23,8 @@ const GroupChatBox: React.FC<ChatBoxProps> = ({
   const router = useRouter();
 
   const handleMessage = () => {
-    router.push(`/(subtabs)/(chats)/groupmessagingscreen/${chatId}` as RelativePathString);
+    console.log('chatBoxChatId', chatId);
+    router.push(`/(subtabs)/(chats)/(groupchat)/${chatId}?name=${name}` as RelativePathString);
   };
 
   return (

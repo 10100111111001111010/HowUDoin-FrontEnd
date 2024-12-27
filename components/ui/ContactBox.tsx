@@ -21,7 +21,7 @@ const ContactBox: React.FC<ContactBoxProps> = ({
   const initials = `${firstName[0]}${lastName[0]}`;
 
   const handleMessage = () => {
-    router.push(`/(subtabs)/(chats)/contactsmessagingscreen/${userId}` as RelativePathString);
+    router.push(`/(subtabs)/(chats)/(chat)/${userId}?name=${fullName}` as RelativePathString);
   };
 
   return (

@@ -57,7 +57,7 @@ const GroupChats = () => {
       }
   
       const response = await fetchWithRetry(
-        'http://10.51.12.33:8080/api/groups/my-groups',
+        'http://172.20.10.10:8090/api/groups/my-groups',
         {
           headers: {
             'User-Id': userId,  // Changed from 'userId' to 'User-Id'
@@ -92,8 +92,9 @@ const GroupChats = () => {
     }
   };
 
-  const handleChatPress = (chatId: string) => {
-    const path = `/(subtabs)/(chats)/${chatId}`;
+  const handleChatPress = (chatId: string, name: string) => {
+    console.log('chatId', chatId);
+    const path = `/(subtabs)/(chats)/(groupchat)/${chatId}?name=${name}`;
     router.push(path as RelativePathString);
   };
 
@@ -107,7 +108,7 @@ const GroupChats = () => {
       name={item.name}
       lastMessage={item.lastMessage || ''}
       unreadCount={item.unreadCount || 0}
-      onPress={() => handleChatPress(item.id)} timestamp={''}    />
+      onPress={() => handleChatPress(item.id, item.name)} timestamp={''}    />
   );
 
   if (loading) {

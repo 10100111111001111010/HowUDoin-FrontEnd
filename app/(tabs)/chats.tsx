@@ -1,125 +1,192 @@
-import React, { useState } from 'react';
+// Chats.tsx
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RelativePathString, useRouter } from 'expo-router';
 import ChatsHeader from '../../components/ui/ChatsHeader';
 import ChatBox from '@/components/ui/ChatBox';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Chat {
   id: string;
-  name: string;
-  lastMessage: string;
-  timestamp: string;
-  unreadCount: number;
+  senderId: string;
+  receiverId: string;
+  content: string;
   status: 'SENT' | 'DELIVERED' | 'READ';
+  createdAt: string;
+  updatedAt: string;
+  valid: boolean;
 }
 
 const Chats = () => {
   const router = useRouter();
+  const [chats, setChats] = useState<Chat[]>([]);
+  const [users, setUsers] = useState<Record<string, string>>({});
+  const [userId, setUserId] = useState<string>('');
 
-  //Example
-  const [chats] = useState<Chat[]>([
-    {
-      id: '1',
-      name: 'Nusret',
-      lastMessage: 'Hello',
-      timestamp: '10:30 AM',
-      unreadCount: 2,
-      status: 'DELIVERED'
-    },
-    {
-      id: '2',
-      name: 'Ahmet',
-      lastMessage: 'Aloha',
-      timestamp: 'Yesterday',
-      unreadCount: 0,
-      status: 'READ'
-    },    
-    {
-      id: '3',
-      name: 'Thiam',
-      lastMessage: 'Goal',
-      timestamp: 'Today',
-      unreadCount: 1,
-      status: 'DELIVERED'
-    },
-    {
-      id: '4',
-      name: 'Dries',
-      lastMessage: 'Hey',
-      timestamp: 'Today',
-      unreadCount: 0,
-      status: 'DELIVERED'
-    },
-    {
-      id: '5',
-      name: 'Ciro',
-      lastMessage: 'Hey',
-      timestamp: 'Today',
-      unreadCount: 0,
-      status: 'DELIVERED'
-    },
-    {
-      id: '6',
-      name: 'Bob',
-      lastMessage: 'Hey',
-      timestamp: 'Today',
-      unreadCount: 0,
-      status: 'DELIVERED'
-    },
-    {
-      id: '7',
-      name: 'Alice',
-      lastMessage: 'Hey',
-      timestamp: 'Today',
-      unreadCount: 0,
-      status: 'DELIVERED'
-    },
-    {
-      id: '8',
-      name: 'Eve',
-      lastMessage: 'Hey',
-      timestamp: 'Today',
-      unreadCount: 0,
-      status: 'DELIVERED'
-    },
-    {
-      id: '9',
-      name: 'Adam',
-      lastMessage: 'Hi',
-      timestamp: 'Today',
-      unreadCount: 0,
-      status: 'DELIVERED'
-    },
+  useEffect(() => {
+    const loadInitialData = async () => {
+      const storedUserId = await AsyncStorage.getItem('userId');
+      if (storedUserId) {
+        setUserId(storedUserId);
+        await fetchChats();
+      }
+    };
 
-  ]);
+    loadInitialData();
+    const interval = setInterval(fetchChats, 2000);
+    return () => clearInterval(interval);
+  }, []);
 
-  const handleChatPress = (chatId: string) => {
-    const path = `/(subtabs)/(chats)/${chatId}` 
-    router.push( path as RelativePathString);
+  useEffect(() => {
+    if (chats.length > 0 && userId) {
+      fetchUsernames();
+    }
+  }, [chats, userId]);
+
+  const fetchChats = async () => {
+    try {
+      const userToken = await AsyncStorage.getItem('userToken');
+      const userId = await AsyncStorage.getItem('userId');
+
+      if (!userToken || !userId) {
+        console.log("User token or ID not found");
+        return;
+      }
+
+      const request = await fetch('http://172.20.10.10:8090/api/messages', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${userToken}`,
+          'User-Id': userId
+        }
+      });
+
+      if (!request.ok) {
+        throw new Error(`Failed to fetch chats: ${request.status}`);
+      }
+
+      const response = await request.json();
+      setChats(response);
+    } catch (error) {
+      console.error('Error fetching chats:', error);
+    }
   };
 
+  const fetchUsernames = async () => {
+    const userToken = await AsyncStorage.getItem('userToken');
+    const userIds = new Set<string>();
+    
+    // Collect unique user IDs from chats
+    chats.forEach(chat => {
+      const otherUserId = chat.senderId === userId ? chat.receiverId : chat.senderId;
+      userIds.add(otherUserId);
+    });
 
-  const renderItem = ({ item }: { item: Chat }) => (
-    <ChatBox
-      chatId={item.id}
-      name={item.name}
-      lastMessage={item.lastMessage}
-      timestamp={item.timestamp}
-      unreadCount={item.unreadCount}
-      status={item.status}
-      onPress={() => handleChatPress(item.id)}
-    />
-  );
+    // Filter out users we already have
+    const userNamesToFetch = Array.from(userIds).filter(id => !users[id]);
+
+    if (userNamesToFetch.length === 0) return;
+
+    try {
+      const requests = userNamesToFetch.map(async (id) => {
+        const response = await fetch(`http://172.20.10.10:8090/api/users/${id}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userToken}`
+          },
+        });
+
+        if (!response.ok) {
+          console.error("Error fetching user:", id);
+          return null;
+        }
+
+        const userData = await response.json();
+        return {
+          id,
+          name: `${userData.firstName} ${userData.lastName}`
+        };
+      });
+
+      const fetchedUsers = (await Promise.all(requests))
+        .filter((user): user is { id: string; name: string } => user !== null)
+        .reduce((acc, user) => ({
+          ...acc,
+          [user.id]: user.name
+        }), {});
+
+      setUsers(prev => ({ ...prev, ...fetchedUsers }));
+    } catch (error) {
+      console.error("Error fetching usernames:", error);
+    }
+  };
+
+  const getLastMessagesPerUser = (messages: Chat[]) => {
+    const conversationMap = new Map<string, Chat>();
+    
+    messages.forEach(message => {
+      const otherUserId = message.senderId === userId ? message.receiverId : message.senderId;
+      const existingMessage = conversationMap.get(otherUserId);
+      
+      if (!existingMessage || new Date(message.createdAt) > new Date(existingMessage.createdAt)) {
+        conversationMap.set(otherUserId, message);
+      }
+    });
+
+    return Array.from(conversationMap.values()).sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  };
+
+  const handleChatPress = (messageId: string, chatId: string, userName: string) => {
+    // const path = `/(subtabs)/(chats)/${messageId}`;
+    // router.push({
+    //   pathname: path as RelativePathString,
+    //   params: { 
+    //     id: messageId,  // mesaj ID'si
+    //     chatId: chatId, // karşı tarafın user ID'si
+    //     name: userName 
+    //   }
+    // });
+    console.log('messageId', messageId);
+    router.push(`/(subtabs)/(chats)/${messageId}?name=${userName}` as RelativePathString);
+  };
+
+  const renderItem = ({ item }: { item: Chat }) => {
+    const otherUserId = item.senderId === userId ? item.receiverId : item.senderId;
+    const userName = users[otherUserId] || "Loading...";
+    
+    return (
+      <ChatBox
+        chatId={otherUserId}
+        name={userName}
+        lastMessage={item.content}
+        timestamp={new Date(item.createdAt).toLocaleTimeString([], { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        })}
+        unreadCount={item.senderId !== userId && item.status !== 'READ' ? 1 : 0}
+        status={item.status}
+        onPress={() => handleChatPress(item.id, otherUserId, userName)}
+      />
+    );
+  };
+
+  const lastMessages = getLastMessagesPerUser(chats);
 
   return (
     <SafeAreaView style={styles.container}>
       <ChatsHeader />
       <FlatList
-        data={chats}
+        data={lastMessages}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => {
+          const otherUserId = item.senderId === userId ? item.receiverId : item.senderId;
+          return otherUserId;
+        }}
         style={styles.list}
         showsVerticalScrollIndicator={false}
         initialNumToRender={10}
